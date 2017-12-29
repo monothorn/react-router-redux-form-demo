@@ -1,13 +1,16 @@
 import React from 'react';
 import {Field, reduxForm} from 'redux-form';
 import {Link} from 'react-router-dom';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import {createPost} from "../actions/index";
 
 class PostsNew extends React.Component {
 
     //field : contains event handlers which we will assign to Field component
     renderField(field) {
         const className = `form-group ${field.meta.touched && field.meta.error ?
-            'has-danger' : ''}`
+            'has-danger' : ''}`;
         return (
             <div className={className}>
                 <label>{field.label}</label>
@@ -20,7 +23,10 @@ class PostsNew extends React.Component {
     }
 
     onSubmit(values) {
-        console.log(values);
+        this.props.createPost(values, () => {
+            console.log('post created');
+            this.props.history.push('/');
+        });
     }
 
     render() {
@@ -66,7 +72,13 @@ function validate(values) {
     return errors;
 }
 
+function mapDispatchToAction(dispatch) {
+    return bindActionCreators({createPost}, dispatch);
+}
+
 export default reduxForm({
     form: 'PostsNewForm',
     validate: validate
-})(PostsNew);
+})(
+    connect(null, mapDispatchToAction)(PostsNew)
+);
